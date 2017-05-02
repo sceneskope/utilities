@@ -35,9 +35,10 @@ dotnet restore "/p:Version=$version"
 
 if ($RunTests) {
     Write-Host "Running tests"
-    Push-Location "$PSScriptRoot\PowerBIClientTests\"
-    dotnet test "/p:Version=$version"
-    Pop-Location
+    Get-ChildItem  -Recurse "tests\*.csproj" |
+    ForEach-Object {
+        & dotnet test $_
+    }
 }
 
 Write-Host "Building"
