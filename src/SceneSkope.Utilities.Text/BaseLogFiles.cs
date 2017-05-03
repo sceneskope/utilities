@@ -13,17 +13,18 @@ namespace SceneSkope.Utilities.Text
     {
         private TLogFile _logFile;
         private string _lastName;
-        private List<string> _files = new List<string>();
+        private readonly List<string> _files = new List<string>();
 
         public TStatus Status { get; }
 
         public string Pattern { get; }
 
-        public BaseLogFiles(string pattern, TStatus status = null)
+        protected BaseLogFiles(string pattern, TStatus status = null)
         {
             Status = status ?? new TStatus { Pattern = pattern };
             Pattern = pattern;
         }
+
         public void Dispose()
         {
             _logFile?.Dispose();
@@ -36,7 +37,6 @@ namespace SceneSkope.Utilities.Text
         {
             while (!cancel.IsCancellationRequested)
             {
-
                 if (((_logFile == null) && (_files.Count > 0)) || ((_logFile != null) && (_files.Count > 1)))
                 {
                     if (_logFile != null)
@@ -51,7 +51,7 @@ namespace SceneSkope.Utilities.Text
                 }
                 else
                 {
-                    var newFiles = await FindNewFilesAsync(cancel);
+                    var newFiles = await FindNewFilesAsync(cancel).ConfigureAwait(false);
                     if (newFiles == null)
                     {
                         return null;
@@ -72,13 +72,13 @@ namespace SceneSkope.Utilities.Text
 
         private async Task<bool> TryGetNextLogFileAsync(CancellationToken cancel)
         {
-            var nextFile = await TryGetNextFileAsync(cancel);
+            var nextFile = await TryGetNextFileAsync(cancel).ConfigureAwait(false);
             if (nextFile != null)
             {
                 var (position, lineNumber) = ((Status.CurrentName != null) && Status.CurrentName.Equals(nextFile)) ?
                     (Status.Position, Status.LineNumber)
                     : (null, 0);
-                _logFile = await GetLogFileAsync(nextFile, cancel, position, lineNumber);
+                _logFile = await GetLogFileAsync(nextFile, cancel, position, lineNumber).ConfigureAwait(false);
                 Status.CurrentName = nextFile;
                 return true;
             }
@@ -92,7 +92,7 @@ namespace SceneSkope.Utilities.Text
         {
             if (_logFile == null)
             {
-                await TryGetNextLogFileAsync(cancel);
+                await TryGetNextLogFileAsync(cancel).ConfigureAwait(false);
             }
             if (_logFile == null)
             {
@@ -100,14 +100,14 @@ namespace SceneSkope.Utilities.Text
             }
             while (true)
             {
-                var (nextLine, lineNumber) = await _logFile.TryReadNextLineAsync(cancel);
+                var (nextLine, lineNumber) = await _logFile.TryReadNextLineAsync(cancel).ConfigureAwait(false);
                 if (nextLine != null)
                 {
                     Status.Position = _logFile.Position;
                     Status.LineNumber = lineNumber;
                     return new UploadedLine { FileName = _logFile.Name, Line = nextLine, LineNumber = lineNumber, Position = _logFile.Position };
                 }
-                if (!await TryGetNextLogFileAsync(cancel))
+                if (!await TryGetNextLogFileAsync(cancel).ConfigureAwait(false))
                 {
                     return null;
                 }

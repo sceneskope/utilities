@@ -30,5 +30,4 @@ namespace SceneSkope.Utilities.Text
             _stream.Dispose();
         }
     }
-
 }

@@ -28,9 +28,9 @@ namespace SceneSkope.Utilities.TextFiles
 
         public async Task ProcessAsync(IList<FileInfo> files, CancellationToken cancel)
         {
-            var results = await ProcessFilesAsync(files, cancel);
+            var results = await ProcessFilesAsync(files, cancel).ConfigureAwait(false);
             var writers = results.Select(kvp => WriteFileAsync(CreateFileName(kvp.Key), kvp.Value, cancel));
-            await Task.WhenAll(writers);
+            await Task.WhenAll(writers).ConfigureAwait(false);
         }
 
         private async Task WriteFileAsync(string name, IList<Tuple<DateTimeOffset, string>> lines, CancellationToken cancel)
@@ -39,9 +39,9 @@ namespace SceneSkope.Utilities.TextFiles
             {
                 var file = new FileInfo(Path.Combine(OutputDirectory.FullName, $"{name}.json"));
                 var sorted = lines.OrderBy(t => t.Item1).Select(t => t.Item2);
-                using (var throttle = await _throttler.ThrottleAsync(cancel))
+                using (var throttle = await _throttler.ThrottleAsync(cancel).ConfigureAwait(false))
                 {
-                    await file.WriteLinesAsArrayAsync(sorted, cancel);
+                    await file.WriteLinesAsArrayAsync(sorted, cancel).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) { throw; }
@@ -49,10 +49,7 @@ namespace SceneSkope.Utilities.TextFiles
             {
                 Console.WriteLine($"Failed to process to {name}: {ex.Message}");
             }
-
-
         }
-
 
         private Task<Dictionary<TKey, List<Tuple<DateTimeOffset, string>>>> ProcessFilesAsync(IList<FileInfo> files, CancellationToken cancel) =>
             files.ParallelAsync(
@@ -73,9 +70,7 @@ namespace SceneSkope.Utilities.TextFiles
                 }
                 list.AddRange(kvp.Value);
             }
-
         }
-
 
         private async Task<Dictionary<TKey, List<Tuple<DateTimeOffset, string>>>> SplitFileAsync(FileInfo file, CancellationToken cancel)
         {
@@ -83,7 +78,7 @@ namespace SceneSkope.Utilities.TextFiles
             using (var reader = file.OpenText())
             {
                 string line;
-                while ((line = await reader.ReadLineAsync()) != null)
+                while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
                     cancel.ThrowIfCancellationRequested();
                     var key = default(TKey);
@@ -101,6 +96,5 @@ namespace SceneSkope.Utilities.TextFiles
             }
             return results;
         }
-
     }
 }

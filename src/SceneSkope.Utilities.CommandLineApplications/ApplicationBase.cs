@@ -8,11 +8,16 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Runtime.Loader;
 using Serilog.Core;
+using System.IO;
 
 namespace SceneSkope.Utilities.CommandLineApplications
 {
     public abstract class ApplicationBase<TArgs> where TArgs : ArgumentsBase, new()
     {
+#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
+        private static readonly char[] SplitCharacters = new[] { ' ', '\t', '\r', '\n' };
+#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
+
         public void ApplicationMain(string[] args)
         {
             var parser = new CommandLineParser.CommandLineParser
@@ -26,6 +31,15 @@ namespace SceneSkope.Utilities.CommandLineApplications
             {
                 var arguments = new TArgs();
                 parser.ExtractArgumentAttributes(arguments);
+                if ((args?.Length == 1) && (args[0].Length > 1) && (args[0][0] == '@')) {
+                    var argsFile = args[0].Substring(1);
+                    if (File.Exists(argsFile))
+                    {
+                        args = File.ReadAllText(argsFile)
+                            .Trim()
+                            .Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries);
+                    }
+                }
                 parser.ParseCommandLine(args);
                 if (arguments.Help)
                 {
@@ -106,7 +120,6 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 Log.Information("Starting up");
 
                 RunAsync(arguments, tokenSource.Token).GetAwaiter().GetResult();
-
             }
             catch (OperationCanceledException)
             {

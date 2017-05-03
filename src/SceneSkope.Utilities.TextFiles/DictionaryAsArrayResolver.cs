@@ -12,15 +12,14 @@ namespace SceneSkope.Utilities.TextFiles
     {
         protected override JsonContract CreateContract(Type objectType)
         {
-            if (objectType.GetTypeInfo().ImplementedInterfaces.Any(i => i == typeof(IDictionary) ||
-                (i.GetTypeInfo().IsGenericType &&
-                 i.GetGenericTypeDefinition() == typeof(IDictionary<,>))))
+            if (objectType.GetTypeInfo().ImplementedInterfaces.Any(i => i == typeof(IDictionary)
+                || (i.GetTypeInfo().IsGenericType
+                 && i.GetGenericTypeDefinition() == typeof(IDictionary<,>))))
             {
                 return base.CreateArrayContract(objectType);
             }
 
             return base.CreateContract(objectType);
         }
-
     }
 }

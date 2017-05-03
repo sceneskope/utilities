@@ -11,7 +11,7 @@ namespace SceneSkope.Utilities.Text
     public class LogFiles<TStatus> : BaseLogFiles<LogFile, TStatus>
         where TStatus : LogFilesStatus, new()
     {
-        private List<string> _incomingFiles = new List<string>();
+        private readonly List<string> _incomingFiles = new List<string>();
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         private readonly DirectoryInfo _baseDirectory;
         internal LogFiles(DirectoryInfo baseDirectory, string pattern, TStatus status = null) : base(pattern, status)
@@ -36,12 +36,11 @@ namespace SceneSkope.Utilities.Text
             }
         }
 
-
         protected override async Task<IEnumerable<string>> FindNewFilesAsync(CancellationToken ct)
         {
             try
             {
-                await _lock.WaitAsync(ct);
+                await _lock.WaitAsync(ct).ConfigureAwait(false);
                 if (_incomingFiles.Count > 0)
                 {
                     var result = _incomingFiles.ToList();

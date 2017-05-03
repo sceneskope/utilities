@@ -19,7 +19,7 @@ namespace SceneSkope.Utilities
             var state = initialiser();
             var locker = new SemaphoreSlim(1);
             var tasks = data.Select(d => ProcessAsync(d, processor, state, combiner, locker, cancel));
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             var result = finaliser(state);
             return result;
         }
@@ -31,8 +31,8 @@ namespace SceneSkope.Utilities
             SemaphoreSlim locker,
             CancellationToken cancel)
         {
-            var result = await processor(data, cancel);
-            await locker.WaitAsync(cancel);
+            var result = await processor(data, cancel).ConfigureAwait(false);
+            await locker.WaitAsync(cancel).ConfigureAwait(false);
             try
             {
                 combiner(state, result);

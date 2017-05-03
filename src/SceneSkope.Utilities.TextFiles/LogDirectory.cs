@@ -14,14 +14,15 @@ namespace SceneSkope.Utilities.Text
         public static async Task<ILogDirectory<TStatus>> CreateAsync(DirectoryInfo directory, ILogStatus<TStatus> status)
         {
             var logDirectory = new LogDirectory<TStatus>(directory, status);
-            await logDirectory.InitialiseAsync();
+            await logDirectory.InitialiseAsync().ConfigureAwait(false);
             return logDirectory;
         }
+
         public DirectoryInfo Directory { get; }
         private readonly FileSystemWatcher _watcher;
-        private List<LogFiles<TStatus>> _logFiles = new List<LogFiles<TStatus>>();
-        private List<Regex> _patterns = new List<Regex>();
-        private SemaphoreSlim _lock = new SemaphoreSlim(1);
+        private readonly List<LogFiles<TStatus>> _logFiles = new List<LogFiles<TStatus>>();
+        private readonly List<Regex> _patterns = new List<Regex>();
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         private LogDirectory(DirectoryInfo directory, ILogStatus<TStatus> status) : base(status)
         {
@@ -41,7 +42,7 @@ namespace SceneSkope.Utilities.Text
             {
                 logFiles.AddFile(file);
             }
-            await _lock.WaitAsync(ct);
+            await _lock.WaitAsync(ct).ConfigureAwait(false);
             try
             {
                 _logFiles.Add(logFiles);

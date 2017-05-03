@@ -48,7 +48,7 @@ namespace SceneSkope.Utilities.TextFiles
             {
                 throw new InvalidOperationException("Not yet initialised");
             }
-            var status = _statuses.FirstOrDefault(s => s.Pattern.Equals(pattern));
+            var status = _statuses.Find(s => s.Pattern.Equals(pattern));
             if (status == null)
             {
                 status = _creator(pattern);
@@ -57,14 +57,13 @@ namespace SceneSkope.Utilities.TextFiles
             return status;
         }
 
-
         public async Task InitialiseAsync()
         {
             if (_statusFile.Exists)
             {
                 try
                 {
-                    var json = await _statusFile.LoadFileAsync();
+                    var json = await _statusFile.LoadFileAsync().ConfigureAwait(false);
                     _statuses = JsonConvert.DeserializeObject<List<T>>(json, _settings);
                 }
                 catch (Exception ex)
@@ -78,6 +77,5 @@ namespace SceneSkope.Utilities.TextFiles
                 _statuses = new List<T>();
             }
         }
-
     }
 }

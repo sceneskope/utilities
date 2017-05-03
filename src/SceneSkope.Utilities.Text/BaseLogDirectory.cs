@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public abstract class BaseLogDirectory<TStatus> : ILogDirectory<TStatus>
+    public abstract class BaseLogDirectory
+    {
+        public static Regex CreatePatternRegex(string pattern)
+            => new Regex(pattern.Replace(".", "\\.").Replace("*", ".*") + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    }
+
+    public abstract class BaseLogDirectory<TStatus> : BaseLogDirectory, ILogDirectory<TStatus>
         where TStatus : LogFilesStatus, new()
     {
         private readonly ILogStatus<TStatus> _status;
@@ -17,13 +23,9 @@ namespace SceneSkope.Utilities.Text
         {
             //_status = new LogStatusFile<TStatus>(statusFile, pattern => new TStatus { Pattern = pattern });
             _status = status;
-
         }
 
         public Task SaveStatusAsync(CancellationToken ct) => _status.SaveStatusAsync(ct);
-
-        public static Regex CreatePatternRegex(string pattern) => new Regex(pattern.Replace(".", "\\.").Replace("*", ".*") + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
 
         protected TStatus GetOrCreateStatusForPattern(string pattern) => _status.GetOrCreateStatusForPattern(pattern);
 

@@ -12,7 +12,7 @@ namespace SceneSkope.Utilities.Text
         private readonly StreamReader _reader;
         private long _position;
         private int _lineNumber;
-        private char[] _buffer = new char[4096];
+        private readonly char[] _buffer = new char[4096];
         private char[] _lineBuffer = new char[1024];
         private int _bufferPosition;
         private int _bufferLength;
@@ -34,9 +34,10 @@ namespace SceneSkope.Utilities.Text
             _lineNumber = lineNumber ?? 0;
         }
 
-        private async Task<bool> TryFillBufferAsync()
+        private async Task<bool> TryFillBufferAsync(CancellationToken ct)
         {
-            var charactersRead = await _reader.ReadBlockAsync(_buffer, 0, _buffer.Length);
+            var charactersRead = await _reader.ReadBlockAsync(_buffer, 0, _buffer.Length).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
             _bufferPosition = 0;
             if (charactersRead == 0)
             {
@@ -58,12 +59,12 @@ namespace SceneSkope.Utilities.Text
 
         public async Task<(string line, int lineNumber)> TryReadNextLineAsync(CancellationToken ct, bool dontNeedNewLine = false)
         {
-            var finished = false;
-            while (!finished)
+            while (true)
             {
+                ct.ThrowIfCancellationRequested();
                 if (_bufferLength == _bufferPosition)
                 {
-                    var gotMoreData = await TryFillBufferAsync();
+                    var gotMoreData = await TryFillBufferAsync(ct).ConfigureAwait(false);
                     if (!gotMoreData)
                     {
                         if (dontNeedNewLine && (_linePosition > 0))
@@ -82,7 +83,7 @@ namespace SceneSkope.Utilities.Text
                     var ch = _buffer[_bufferPosition++];
                     if ((ch == '\n') || (ch == '\r'))
                     {
-                        _position += 1;
+                        _position++;
                         if (_linePosition > 0)
                         {
                             return CompleteLine();
@@ -100,7 +101,6 @@ namespace SceneSkope.Utilities.Text
                     }
                 }
             }
-            return (null, -1);
         }
 
         private (string line, int lineNumber) CompleteLine()
@@ -109,10 +109,9 @@ namespace SceneSkope.Utilities.Text
             var bytesCount = _reader.CurrentEncoding.GetByteCount(line);
             _position += bytesCount;
             _linePosition = 0;
-            _lineNumber += 1;
+            _lineNumber++;
             return (line, _lineNumber);
         }
-
 
         public void Dispose()
         {

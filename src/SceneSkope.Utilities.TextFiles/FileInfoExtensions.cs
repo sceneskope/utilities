@@ -13,7 +13,7 @@ namespace SceneSkope.Utilities.TextFiles
         {
             using (var reader = file.OpenText())
             {
-                return await reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
             }
         }
 
@@ -21,26 +21,25 @@ namespace SceneSkope.Utilities.TextFiles
         {
             using (var writer = file.CreateText())
             {
-                await writer.WriteAsync('[');
+                await writer.WriteAsync('[').ConfigureAwait(false);
                 var first = true;
                 foreach (var line in lines)
                 {
                     cancel.ThrowIfCancellationRequested();
                     if (!first)
                     {
-                        await writer.WriteLineAsync(',');
+                        await writer.WriteLineAsync(',').ConfigureAwait(false);
                     }
                     else
                     {
-                        await writer.WriteLineAsync();
+                        await writer.WriteLineAsync().ConfigureAwait(false);
                         first = false;
                     }
-                    await writer.WriteAsync(line);
+                    await writer.WriteAsync(line).ConfigureAwait(false);
                 }
-                await writer.WriteLineAsync(']');
-                await writer.FlushAsync();
+                await writer.WriteLineAsync(']').ConfigureAwait(false);
+                await writer.FlushAsync().ConfigureAwait(false);
             }
-
         }
     }
 }

@@ -18,6 +18,5 @@ namespace SceneSkope.Utilities.Text
 
         [JsonProperty("LineNumber", DefaultValueHandling = DefaultValueHandling.Populate)]
         public int LineNumber { get; set; }
-
     }
 }

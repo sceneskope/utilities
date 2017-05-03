@@ -31,7 +31,7 @@ namespace SceneSkope.Utilities
 
         public async Task<IDisposable> ThrottleAsync(CancellationToken cancel)
         {
-            await _throttler.WaitAsync(cancel);
+            await _throttler.WaitAsync(cancel).ConfigureAwait(false);
             return new Lock(_throttler);
         }
     }

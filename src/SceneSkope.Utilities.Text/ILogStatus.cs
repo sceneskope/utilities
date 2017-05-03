@@ -8,7 +8,6 @@ namespace SceneSkope.Utilities.Text
 {
     public interface ILogStatus<T> where T : LogFilesStatus
     {
-
         Task SaveStatusAsync(CancellationToken ct);
 
         T GetOrCreateStatusForPattern(string pattern);

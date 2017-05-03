@@ -63,10 +63,10 @@ namespace SceneSkope.Utilities.TextFiles
         }
 
         public bool Exists => File.Exists;
-        public async Task SaveAsync(string content, CancellationToken cancel)
+        public async Task SaveAsync(string content, CancellationToken ct)
         {
             Backup();
-            await SaveFileAsync(File, content);
+            await SaveFileAsync(File, content, ct).ConfigureAwait(false);
             Cleanup();
         }
 
@@ -76,17 +76,17 @@ namespace SceneSkope.Utilities.TextFiles
         {
             using (var reader = file.OpenText())
             {
-                return await reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
             }
         }
 
-        private async Task SaveFileAsync(FileInfo file, string text)
+        private async Task SaveFileAsync(FileInfo file, string text, CancellationToken ct)
         {
             using (var writer = file.CreateText())
             {
-                await writer.WriteAsync(text);
+                await writer.WriteAsync(text).ConfigureAwait(false);
+                ct.ThrowIfCancellationRequested();
             }
         }
-
     }
 }
