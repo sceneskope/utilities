@@ -7,7 +7,7 @@ environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 build_script:
-- ps: .\build.ps1 -BuildNumber "$env:APPVEYOR_BUILD_NUMBER" -RunTests $false
+- ps: .\build.ps1 -BuildNumber "$env:APPVEYOR_BUILD_NUMBER" -RunTests $true
 
 test: off
 
