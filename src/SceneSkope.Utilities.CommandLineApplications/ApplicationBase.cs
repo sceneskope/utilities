@@ -9,6 +9,8 @@ using System.Threading;
 using System.Runtime.Loader;
 using Serilog.Core;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace SceneSkope.Utilities.CommandLineApplications
 {
@@ -18,8 +20,29 @@ namespace SceneSkope.Utilities.CommandLineApplications
         private static readonly char[] SplitCharacters = new[] { ' ', '\t', '\r', '\n' };
 #pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
 
+#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
+        private static string[] PreProcessArgs(string[] args)
+#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
+        {
+            if ((args?.Length > 0) && (args[0].Length > 1) && (args[0][0] == '@'))
+            {
+                var fileName = args[0].Substring(1);
+                if (File.Exists(fileName))
+                {
+                    var contents = string.Join(" ", File.ReadAllLines(fileName));
+                    var parts = Regex.Matches(contents, @"[\""].+?[\""]|[^ ]+", RegexOptions.Multiline)
+                        .Cast<Match>()
+                        .Select(m => m.Value.Replace("\"", ""))
+                        .ToArray();
+                    return parts;
+                }
+            }
+            return args;
+        }
+
         public void ApplicationMain(string[] args)
         {
+            string[] processedArgs = null;
             var parser = new CommandLineParser.CommandLineParser
             {
                 AcceptSlash = true,
@@ -31,16 +54,8 @@ namespace SceneSkope.Utilities.CommandLineApplications
             {
                 var arguments = new TArgs();
                 parser.ExtractArgumentAttributes(arguments);
-                if ((args?.Length == 1) && (args[0].Length > 1) && (args[0][0] == '@')) {
-                    var argsFile = args[0].Substring(1);
-                    if (File.Exists(argsFile))
-                    {
-                        args = File.ReadAllText(argsFile)
-                            .Trim()
-                            .Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries);
-                    }
-                }
-                parser.ParseCommandLine(args);
+                processedArgs = PreProcessArgs(args);
+                parser.ParseCommandLine(processedArgs);
                 if (arguments.Help)
                 {
                     parser.ShowUsage();
@@ -55,7 +70,14 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 Console.WriteLine(ex.Message);
                 foreach (var arg in args)
                 {
-                    Console.WriteLine(arg);
+                    Console.WriteLine($"Argument: {arg}");
+                }
+                if ((processedArgs != null) && (processedArgs != args))
+                {
+                    foreach (var arg in processedArgs)
+                    {
+                        Console.WriteLine($"Processed: {arg}");
+                    }
                 }
                 parser.ShowUsage();
             }
