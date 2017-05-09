@@ -11,10 +11,10 @@ namespace SceneSkope.Utilities.Text
     public class LogDirectory<TStatus> : BaseLogDirectory<TStatus>
         where TStatus : LogFilesStatus, new()
     {
-        public static async Task<ILogDirectory<TStatus>> CreateAsync(DirectoryInfo directory, ILogStatus<TStatus> status)
+        public static async Task<ILogDirectory<TStatus>> CreateAsync(DirectoryInfo directory, ILogStatus<TStatus> status, CancellationToken ct)
         {
             var logDirectory = new LogDirectory<TStatus>(directory, status);
-            await logDirectory.InitialiseAsync().ConfigureAwait(false);
+            await logDirectory.InitialiseAsync(ct).ConfigureAwait(false);
             return logDirectory;
         }
 

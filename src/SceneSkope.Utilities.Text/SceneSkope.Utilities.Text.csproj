@@ -10,6 +10,7 @@
     <PackageReference Include="Roslynator.Analyzers" Version="1.3.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

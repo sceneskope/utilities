@@ -12,6 +12,6 @@ namespace SceneSkope.Utilities.Text
 
         T GetOrCreateStatusForPattern(string pattern);
 
-        Task InitialiseAsync();
+        Task InitialiseAsync(CancellationToken ct);
     }
 }

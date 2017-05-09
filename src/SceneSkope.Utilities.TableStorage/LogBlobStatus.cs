@@ -1,33 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Polly;
 using SceneSkope.Utilities.Text;
 using Serilog;
 
-namespace SceneSkope.Utilities.TextFiles
+namespace SceneSkope.Utilities.TableStorage
 {
-    public class LogStatusFile<T> : ILogStatus<T> where T : LogFilesStatus
+    public class LogBlobStatus<T> : ILogStatus<T> where T : LogFilesStatus
     {
         private readonly JsonSerializerSettings _settings;
 
-        private readonly AtomicTextFile _statusFile;
+        private readonly CloudBlockBlob _blob;
         private List<T> _statuses;
         private readonly Func<string, T> _creator;
+        private readonly Policy _policy =
+            Policy
+            .Handle<StorageException>(ex =>
+            {
+                switch (ex?.RequestInformation?.HttpStatusCode)
+                {
+                    default: return true;
+                }
+            })
+            .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
+                => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
 
-        public LogStatusFile(FileInfo statusFile, Func<string, T> creator) : this(new AtomicTextFile(statusFile), creator)
+        public LogBlobStatus(CloudBlockBlob blob, Func<string, T> creator)
         {
-        }
-
-        public LogStatusFile(AtomicTextFile statusFile, Func<string, T> creator)
-        {
-            _statusFile = statusFile;
+            _blob = blob;
             _creator = creator;
             _settings = new JsonSerializerSettings
             {
@@ -39,7 +47,8 @@ namespace SceneSkope.Utilities.TextFiles
         public Task SaveStatusAsync(CancellationToken ct)
         {
             var json = JsonConvert.SerializeObject(_statuses, _settings);
-            return _statusFile.SaveAsync(json, ct);
+            return _policy.ExecuteAsync(cancel =>
+                _blob.UploadTextAsync(json, Encoding.UTF8, null, null, null, cancel), ct, false);
         }
 
         public T GetOrCreateStatusForPattern(string pattern)
@@ -59,11 +68,12 @@ namespace SceneSkope.Utilities.TextFiles
 
         public async Task InitialiseAsync(CancellationToken ct)
         {
-            if (_statusFile.Exists)
+            if (await _policy.ExecuteAsync(cancel => _blob.ExistsAsync(null, null, cancel), ct, false).ConfigureAwait(false))
             {
                 try
                 {
-                    var json = await _statusFile.LoadFileAsync().ConfigureAwait(false);
+                    var json = await _policy.ExecuteAsync(cancel =>
+                        _blob.DownloadTextAsync(Encoding.UTF8, null, null, null, cancel), ct, false).ConfigureAwait(false);
                     _statuses = JsonConvert.DeserializeObject<List<T>>(json, _settings);
                 }
                 catch (Exception ex)

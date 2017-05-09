@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json.Serialization;
-using System.Reflection;
-using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Newtonsoft.Json.Serialization;
 
-namespace SceneSkope.Utilities.TextFiles
+namespace SceneSkope.Utilities.Text
 {
     public class DictionaryAsArrayResolver : DefaultContractResolver
     {

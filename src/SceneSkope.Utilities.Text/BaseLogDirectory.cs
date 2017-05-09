@@ -29,7 +29,7 @@ namespace SceneSkope.Utilities.Text
 
         protected TStatus GetOrCreateStatusForPattern(string pattern) => _status.GetOrCreateStatusForPattern(pattern);
 
-        protected Task InitialiseAsync() => _status.InitialiseAsync();
+        protected Task InitialiseAsync(CancellationToken ct) => _status.InitialiseAsync(ct);
 
         public abstract Task<ILogFiles<TStatus>> GetLogFilesAsync(string pattern, CancellationToken ct);
 
