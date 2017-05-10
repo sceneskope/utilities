@@ -6,21 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using Polly;
 using SceneSkope.Utilities.Text;
 using Serilog;
 
 namespace SceneSkope.Utilities.TableStorage
 {
-    public class LogBlobStatus<T> : ILogStatus<T> where T : LogFilesStatus
+    public class LogBlobStatus : ILogStatus
     {
         private readonly JsonSerializerSettings _settings;
 
         private readonly CloudBlockBlob _blob;
-        private List<T> _statuses;
-        private readonly Func<string, T> _creator;
+        private List<LogFilesStatus> _statuses;
         private readonly Policy _policy =
             Policy
             .Handle<StorageException>(ex =>
@@ -33,15 +30,14 @@ namespace SceneSkope.Utilities.TableStorage
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
                 => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
 
-        public LogBlobStatus(CloudBlockBlob blob, Func<string, T> creator)
+        public LogBlobStatus(CloudBlockBlob blob)
         {
             _blob = blob;
-            _creator = creator;
             _settings = new JsonSerializerSettings
             {
                 ContractResolver = new DictionaryAsArrayResolver(),
                 Formatting = Formatting.Indented
-            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            };
         }
 
         public Task SaveStatusAsync(CancellationToken ct)
@@ -51,7 +47,7 @@ namespace SceneSkope.Utilities.TableStorage
                 _blob.UploadTextAsync(json, Encoding.UTF8, null, null, null, cancel), ct, false);
         }
 
-        public T GetOrCreateStatusForPattern(string pattern)
+        public LogFilesStatus GetOrCreateStatusForPattern(string pattern)
         {
             if (_statuses == null)
             {
@@ -60,7 +56,7 @@ namespace SceneSkope.Utilities.TableStorage
             var status = _statuses.Find(s => s.Pattern.Equals(pattern));
             if (status == null)
             {
-                status = _creator(pattern);
+                status = new LogFilesStatus { Pattern = pattern };
                 _statuses.Add(status);
             }
             return status;
@@ -74,17 +70,17 @@ namespace SceneSkope.Utilities.TableStorage
                 {
                     var json = await _policy.ExecuteAsync(cancel =>
                         _blob.DownloadTextAsync(Encoding.UTF8, null, null, null, cancel), ct, false).ConfigureAwait(false);
-                    _statuses = JsonConvert.DeserializeObject<List<T>>(json, _settings);
+                    _statuses = JsonConvert.DeserializeObject<List<LogFilesStatus>>(json, _settings);
                 }
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Failed to read status files: {exception}", ex.Message);
-                    _statuses = new List<T>();
+                    _statuses = new List<LogFilesStatus>();
                 }
             }
             else
             {
-                _statuses = new List<T>();
+                _statuses = new List<LogFilesStatus>();
             }
         }
     }

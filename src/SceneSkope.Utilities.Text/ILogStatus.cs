@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public interface ILogStatus<T> where T : LogFilesStatus
+    public interface ILogStatus
     {
         Task SaveStatusAsync(CancellationToken ct);
 
-        T GetOrCreateStatusForPattern(string pattern);
+        LogFilesStatus GetOrCreateStatusForPattern(string pattern);
 
         Task InitialiseAsync(CancellationToken ct);
     }

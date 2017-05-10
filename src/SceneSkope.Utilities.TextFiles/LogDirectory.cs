@@ -8,23 +8,22 @@ using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public class LogDirectory<TStatus> : BaseLogDirectory<TStatus>
-        where TStatus : LogFilesStatus, new()
+    public class LogDirectory : BaseLogDirectory
     {
-        public static async Task<ILogDirectory<TStatus>> CreateAsync(DirectoryInfo directory, ILogStatus<TStatus> status, CancellationToken ct)
+        public static async Task<ILogDirectory> CreateAsync(DirectoryInfo directory, ILogStatus status, CancellationToken ct)
         {
-            var logDirectory = new LogDirectory<TStatus>(directory, status);
+            var logDirectory = new LogDirectory(directory, status);
             await logDirectory.InitialiseAsync(ct).ConfigureAwait(false);
             return logDirectory;
         }
 
         public DirectoryInfo Directory { get; }
         private readonly FileSystemWatcher _watcher;
-        private readonly List<LogFiles<TStatus>> _logFiles = new List<LogFiles<TStatus>>();
+        private readonly List<LogFiles> _logFiles = new List<LogFiles>();
         private readonly List<Regex> _patterns = new List<Regex>();
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
-        private LogDirectory(DirectoryInfo directory, ILogStatus<TStatus> status) : base(status)
+        private LogDirectory(DirectoryInfo directory, ILogStatus status) : base(status)
         {
             Directory = directory;
             _watcher = new FileSystemWatcher(directory.FullName);
@@ -33,10 +32,10 @@ namespace SceneSkope.Utilities.Text
             _watcher.EnableRaisingEvents = true;
         }
 
-        public override async Task<ILogFiles<TStatus>> GetLogFilesAsync(string pattern, CancellationToken ct)
+        public override async Task<ILogFiles> GetLogFilesAsync(string pattern, CancellationToken ct)
         {
             var status = GetOrCreateStatusForPattern(pattern);
-            var logFiles = new LogFiles<TStatus>(Directory, pattern, status);
+            var logFiles = new LogFiles(Directory, pattern, status);
             var regex = CreatePatternRegex(pattern);
             foreach (var file in Directory.EnumerateFiles(pattern))
             {

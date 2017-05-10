@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SceneSkope.Utilities.Text
 {
@@ -18,5 +15,8 @@ namespace SceneSkope.Utilities.Text
 
         [JsonProperty("LineNumber", DefaultValueHandling = DefaultValueHandling.Populate)]
         public int LineNumber { get; set; }
+
+        [JsonProperty("Additional")]
+        public string Additional { get; set; }
     }
 }

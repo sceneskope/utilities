@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public class LogFiles<TStatus> : BaseLogFiles<LogFile, TStatus>
-        where TStatus : LogFilesStatus, new()
+    public class LogFiles : BaseLogFiles<LogFile>
     {
         private readonly List<string> _incomingFiles = new List<string>();
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         private readonly DirectoryInfo _baseDirectory;
-        internal LogFiles(DirectoryInfo baseDirectory, string pattern, TStatus status = null) : base(pattern, status)
+        internal LogFiles(DirectoryInfo baseDirectory, string pattern, LogFilesStatus status = null) : base(pattern, status)
         {
             _baseDirectory = baseDirectory;
         }

@@ -6,34 +6,30 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using SceneSkope.Utilities.Text;
 using Serilog;
 
 namespace SceneSkope.Utilities.TextFiles
 {
-    public class LogStatusFile<T> : ILogStatus<T> where T : LogFilesStatus
+    public class LogStatusFile : ILogStatus
     {
         private readonly JsonSerializerSettings _settings;
 
         private readonly AtomicTextFile _statusFile;
-        private List<T> _statuses;
-        private readonly Func<string, T> _creator;
+        private List<LogFilesStatus> _statuses;
 
-        public LogStatusFile(FileInfo statusFile, Func<string, T> creator) : this(new AtomicTextFile(statusFile), creator)
+        public LogStatusFile(FileInfo statusFile) : this(new AtomicTextFile(statusFile))
         {
         }
 
-        public LogStatusFile(AtomicTextFile statusFile, Func<string, T> creator)
+        public LogStatusFile(AtomicTextFile statusFile)
         {
             _statusFile = statusFile;
-            _creator = creator;
             _settings = new JsonSerializerSettings
             {
                 ContractResolver = new DictionaryAsArrayResolver(),
                 Formatting = Formatting.Indented
-            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            };
         }
 
         public Task SaveStatusAsync(CancellationToken ct)
@@ -42,7 +38,7 @@ namespace SceneSkope.Utilities.TextFiles
             return _statusFile.SaveAsync(json, ct);
         }
 
-        public T GetOrCreateStatusForPattern(string pattern)
+        public LogFilesStatus GetOrCreateStatusForPattern(string pattern)
         {
             if (_statuses == null)
             {
@@ -51,7 +47,7 @@ namespace SceneSkope.Utilities.TextFiles
             var status = _statuses.Find(s => s.Pattern.Equals(pattern));
             if (status == null)
             {
-                status = _creator(pattern);
+                status = new LogFilesStatus { Pattern = pattern };
                 _statuses.Add(status);
             }
             return status;
@@ -64,17 +60,17 @@ namespace SceneSkope.Utilities.TextFiles
                 try
                 {
                     var json = await _statusFile.LoadFileAsync().ConfigureAwait(false);
-                    _statuses = JsonConvert.DeserializeObject<List<T>>(json, _settings);
+                    _statuses = JsonConvert.DeserializeObject<List<LogFilesStatus>>(json, _settings);
                 }
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Failed to read status files: {exception}", ex.Message);
-                    _statuses = new List<T>();
+                    _statuses = new List<LogFilesStatus>();
                 }
             }
             else
             {
-                _statuses = new List<T>();
+                _statuses = new List<LogFilesStatus>();
             }
         }
     }

@@ -7,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public abstract class BaseLogFiles<TLogFile, TStatus> : ILogFiles<TStatus>
+    public abstract class BaseLogFiles<TLogFile> : ILogFiles
         where TLogFile : class, ILogFile
-        where TStatus : LogFilesStatus, new()
     {
         private TLogFile _logFile;
         private string _lastName;
         private readonly List<string> _files = new List<string>();
 
-        public TStatus Status { get; }
+        public LogFilesStatus Status { get; }
 
         public string Pattern { get; }
 
-        protected BaseLogFiles(string pattern, TStatus status = null)
+        protected BaseLogFiles(string pattern, LogFilesStatus status)
         {
-            Status = status ?? new TStatus { Pattern = pattern };
+            Status = status ?? new LogFilesStatus { Pattern = pattern };
             Pattern = pattern;
         }
 

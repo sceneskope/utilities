@@ -12,8 +12,7 @@ using Serilog;
 
 namespace SceneSkope.Utilities.TableStorage
 {
-    public class LogTableStorage<TStatus> : BaseLogDirectory<TStatus>
-        where TStatus : LogFilesStatus, new()
+    public class LogTableStorage : BaseLogDirectory
     {
 #pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
         private static readonly Policy _policy =
@@ -29,15 +28,15 @@ namespace SceneSkope.Utilities.TableStorage
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
                 => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
 
-        public static async Task<ILogDirectory<TStatus>> CreateAsync(string account, string accessKey, string tableName, string statusBlobContainerName, string statusBlobName, Func<string, TStatus> creator, CancellationToken ct)
+        public static async Task<ILogDirectory> CreateAsync(string account, string accessKey, string tableName, string statusBlobContainerName, string statusBlobName, CancellationToken ct)
         {
             var credentials = new StorageCredentials(account, accessKey);
             var storageAccount = new CloudStorageAccount(credentials, true);
             var table = await CreateTableStorageAsync(storageAccount, tableName, ct).ConfigureAwait(false);
             var blob = await CreateStatusBlobAsync(storageAccount, statusBlobContainerName, statusBlobName, ct).ConfigureAwait(false);
-            var status = new LogBlobStatus<TStatus>(blob, creator);
+            var status = new LogBlobStatus(blob);
 
-            var storage = new LogTableStorage<TStatus>(table, status);
+            var storage = new LogTableStorage(table, status);
             await storage.InitialiseAsync(ct).ConfigureAwait(false);
             return storage;
         }
@@ -67,7 +66,7 @@ namespace SceneSkope.Utilities.TableStorage
 
         private readonly CloudTable _table;
 
-        public LogTableStorage(CloudTable table, LogBlobStatus<TStatus> statusBlob) : base(statusBlob)
+        public LogTableStorage(CloudTable table, LogBlobStatus statusBlob) : base(statusBlob)
         {
             _table = table;
         }
@@ -76,11 +75,11 @@ namespace SceneSkope.Utilities.TableStorage
         {
         }
 
-        public override Task<ILogFiles<TStatus>> GetLogFilesAsync(string pattern, CancellationToken ct)
+        public override Task<ILogFiles> GetLogFilesAsync(string pattern, CancellationToken ct)
         {
             var status = GetOrCreateStatusForPattern(pattern);
-            var partitions = new LogTablePartitions<TStatus>(_table, pattern, status);
-            return Task.FromResult((ILogFiles<TStatus>)partitions);
+            var partitions = new LogTablePartitions(_table, pattern, status);
+            return Task.FromResult((ILogFiles)partitions);
         }
     }
 }

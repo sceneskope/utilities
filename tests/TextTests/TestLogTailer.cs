@@ -136,14 +136,14 @@ namespace TextTests
             }
         }
 
-        private LogStatusFile<LogFilesStatus> CreateStatusFile(FileInfo file) => new LogStatusFile<LogFilesStatus>(file, pattern => new LogFilesStatus { Pattern = pattern });
+        private LogStatusFile CreateStatusFile(FileInfo file) => new LogStatusFile(file);
 
         [Fact]
         public async Task VerifyHandlingRollOverLogWorksOkAsync()
         {
             var cancel = CancellationToken.None;
             using (var folder = new TemporaryFolder())
-            using (var logDirectory = await LogDirectory<LogFilesStatus>.CreateAsync(folder.Directory, CreateStatusFile(folder.CreateFileInfo(".json")), _ct))
+            using (var logDirectory = await LogDirectory.CreateAsync(folder.Directory, CreateStatusFile(folder.CreateFileInfo(".json")), _ct))
             {
                 var log = await logDirectory.GetLogFilesAsync("api*.txt", cancel);
                 var firstFile = folder.GetFileName("api-2016-12-10.txt");
@@ -230,7 +230,7 @@ namespace TextTests
                     await writer.FlushAsync();
                 }
 
-                using (var logDirectory = await LogDirectory<LogFilesStatus>.CreateAsync(folder.Directory, statusFile, _ct))
+                using (var logDirectory = await LogDirectory.CreateAsync(folder.Directory, statusFile, _ct))
                 using (var log = await logDirectory.GetLogFilesAsync("api*.txt", cancel))
                 {
                     var info = await log.TryReadNextLineAsync(cancel);
@@ -245,7 +245,7 @@ namespace TextTests
                     Assert.Equal(1, info.LineNumber);
                 }
 
-                using (var logDirectory = await LogDirectory<LogFilesStatus>.CreateAsync(folder.Directory, statusFile, _ct))
+                using (var logDirectory = await LogDirectory.CreateAsync(folder.Directory, statusFile, _ct))
                 using (var log = await logDirectory.GetLogFilesAsync("api*.txt", cancel))
                 {
                     var info = await log.TryReadNextLineAsync(cancel);

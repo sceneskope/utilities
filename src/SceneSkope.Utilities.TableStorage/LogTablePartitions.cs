@@ -8,18 +8,17 @@ using SceneSkope.Utilities.Text;
 
 namespace SceneSkope.Utilities.TableStorage
 {
-    internal sealed class LogTablePartitions<TStatus> : BaseLogFiles<LogTablePartition, TStatus>
-        where TStatus : LogFilesStatus, new()
+    internal sealed class LogTablePartitions : BaseLogFiles<LogTablePartition>
     {
         private readonly CloudTable _table;
         private string _highestName;
         private readonly Regex _patternRegex;
         private bool _firstTime = true;
 
-        public LogTablePartitions(CloudTable table, string pattern, TStatus status) : base(pattern, status)
+        public LogTablePartitions(CloudTable table, string pattern, LogFilesStatus status) : base(pattern, status)
         {
             _table = table;
-            _patternRegex = BaseLogDirectory<TStatus>.CreatePatternRegex(pattern);
+            _patternRegex = BaseLogDirectory.CreatePatternRegex(pattern);
             if (status != null)
             {
                 _highestName = status.CurrentName;

@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 
 namespace SceneSkope.Utilities.Text
 {
-    public interface ILogFiles<TStatus> : IDisposable
-        where TStatus : LogFilesStatus
+    public interface ILogFiles : IDisposable
     {
-        TStatus Status { get; }
+        LogFilesStatus Status { get; }
         Task<UploadedLine> TryReadNextLineAsync(CancellationToken cancel);
     }
 }
