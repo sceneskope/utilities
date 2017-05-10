@@ -31,7 +31,7 @@ namespace SceneSkope.Utilities.TableStorage
         {
             var credentials = new StorageCredentials(account, accessKey);
             var storageAccount = new CloudStorageAccount(credentials, true);
-            var table = await CreateTableStorageAsync(storageAccount, tableName, ct).ConfigureAwait(false);
+            var table = CreateTableStorage(storageAccount, tableName);
             var blob = await CreateStatusBlobAsync(storageAccount, statusBlobContainerName, statusBlobName, ct).ConfigureAwait(false);
             var status = new LogBlobStatus(blob);
 
@@ -40,17 +40,10 @@ namespace SceneSkope.Utilities.TableStorage
             return storage;
         }
 
-#pragma warning disable RCS1163 // Unused parameter.
-        private static async Task<CloudTable> CreateTableStorageAsync(CloudStorageAccount account, string tableName, CancellationToken ct)
-#pragma warning restore RCS1163 // Unused parameter.
+        private static CloudTable CreateTableStorage(CloudStorageAccount account, string tableName)
         {
             var client = account.CreateCloudTableClient();
-            var table = client.GetTableReference(tableName);
-            if (!(await table.ExistsAsync().ConfigureAwait(false)))
-            {
-                await table.CreateAsync().ConfigureAwait(false);
-            }
-            return table;
+            return client.GetTableReference(tableName);
         }
 
         private static async Task<CloudBlockBlob> CreateStatusBlobAsync(CloudStorageAccount account, string blobContainer, string blobName, CancellationToken ct)
