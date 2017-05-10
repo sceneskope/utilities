@@ -10,9 +10,9 @@ using Polly;
 using SceneSkope.Utilities.Text;
 using Serilog;
 
-namespace SceneSkope.Utilities.TableStorage
+namespace SceneSkope.Utilities.BlobStorage
 {
-    public class LogBlobStatus : ILogStatus
+    public class LogStatusBlob : ILogStatus
     {
         private readonly JsonSerializerSettings _settings;
 
@@ -30,9 +30,11 @@ namespace SceneSkope.Utilities.TableStorage
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
                 => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
 
-        public LogBlobStatus(CloudBlockBlob blob)
+        public LogStatusBlob(CloudStorageAccount account, string containerName, string blobName)
         {
-            _blob = blob;
+            var client = account.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            _blob = container.GetBlockBlobReference(blobName);
             _settings = new JsonSerializerSettings
             {
                 ContractResolver = new DictionaryAsArrayResolver(),
@@ -64,6 +66,7 @@ namespace SceneSkope.Utilities.TableStorage
 
         public async Task InitialiseAsync(CancellationToken ct)
         {
+            await _policy.ExecuteAsync(cancel => _blob.Container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Container, null, null, cancel), ct, false).ConfigureAwait(false);
             if (await _policy.ExecuteAsync(cancel => _blob.ExistsAsync(null, null, cancel), ct, false).ConfigureAwait(false))
             {
                 try

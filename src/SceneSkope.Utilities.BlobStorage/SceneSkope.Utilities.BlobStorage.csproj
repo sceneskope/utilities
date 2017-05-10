@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SceneSkope.Utilities.BlobStorage\SceneSkope.Utilities.BlobStorage.csproj" />
     <ProjectReference Include="..\SceneSkope.Utilities.Text\SceneSkope.Utilities.Text.csproj" />
   </ItemGroup>
 

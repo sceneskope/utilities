@@ -19,18 +19,12 @@ namespace SceneSkope.Utilities.TableStorage
         {
             _table = table;
             _patternRegex = BaseLogDirectory.CreatePatternRegex(pattern);
-            if (status != null)
-            {
-                _highestName = status.CurrentName;
-            }
-            else
-            {
-                _highestName = "";
-            }
         }
 
         protected override async Task<IEnumerable<string>> FindNewFilesAsync(CancellationToken ct)
         {
+            _highestName = _highestName ?? Status?.CurrentName ?? "";
+
             string newHighest = null;
             TableContinuationToken continuation = null;
             List<string> partitions = null;
