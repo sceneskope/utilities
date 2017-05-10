@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExportSqlDatabase": {
+      "commandName": "Project",
+      "commandLineArgs": " --outputdirectory c:\\temp\\LocalChTest --sqlconnection \"Server=.\\SQLEXPRESS;Trusted_Connection=Yes;Database=LocalChTest\""
+    }
+  }
+}

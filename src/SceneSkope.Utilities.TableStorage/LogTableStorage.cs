@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -41,19 +40,17 @@ namespace SceneSkope.Utilities.TableStorage
             return storage;
         }
 
-#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
+#pragma warning disable RCS1163 // Unused parameter.
         private static async Task<CloudTable> CreateTableStorageAsync(CloudStorageAccount account, string tableName, CancellationToken ct)
-#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
+#pragma warning restore RCS1163 // Unused parameter.
         {
             var client = account.CreateCloudTableClient();
             var table = client.GetTableReference(tableName);
-            await table.CreateIfNotExistsAsync(null, null, ct).ConfigureAwait(false);
+            await table.CreateIfNotExistsAsync().ConfigureAwait(false);
             return table;
         }
 
-#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
         private static async Task<CloudBlockBlob> CreateStatusBlobAsync(CloudStorageAccount account, string blobContainer, string blobName, CancellationToken ct)
-#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
         {
             var client = account.CreateCloudBlobClient();
             var container = client.GetContainerReference(blobContainer);

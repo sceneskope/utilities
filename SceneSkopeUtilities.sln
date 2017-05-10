@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneSkope.Utilities.Text",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneSkope.Utilities.TableStorage", "src\SceneSkope.Utilities.TableStorage\SceneSkope.Utilities.TableStorage.csproj", "{91BAB883-599F-466F-9A64-EA3C3BC627C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportSqlDatabase", "src\ExportSqlDatabase\ExportSqlDatabase.csproj", "{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{91BAB883-599F-466F-9A64-EA3C3BC627C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91BAB883-599F-466F-9A64-EA3C3BC627C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91BAB883-599F-466F-9A64-EA3C3BC627C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +75,6 @@ Global
 		{C8E8C191-E049-4F5A-AB34-2839E88CA74B} = {CB9B9818-3F15-4A73-A5DC-5AF668CB8991}
 		{0ADBFB20-A8C8-4EA7-8FC1-5319CD99C7BE} = {DA7C3DD2-2618-4CDB-AE83-BF323DBDA466}
 		{91BAB883-599F-466F-9A64-EA3C3BC627C1} = {DA7C3DD2-2618-4CDB-AE83-BF323DBDA466}
+		{C5F97C8E-E9D9-4002-A994-B9B05C7C1ECC} = {DA7C3DD2-2618-4CDB-AE83-BF323DBDA466}
 	EndGlobalSection
 EndGlobal

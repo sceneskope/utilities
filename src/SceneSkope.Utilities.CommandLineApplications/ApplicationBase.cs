@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.Loader;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Serilog;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Runtime.Loader;
 using Serilog.Core;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Linq;
 
 namespace SceneSkope.Utilities.CommandLineApplications
 {
     public abstract class ApplicationBase<TArgs> where TArgs : ArgumentsBase, new()
     {
-#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
-        private static readonly char[] SplitCharacters = new[] { ' ', '\t', '\r', '\n' };
-#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
-
 #pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
         private static string[] PreProcessArgs(string[] args)
 #pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
@@ -30,7 +24,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 if (File.Exists(fileName))
                 {
                     var contents = string.Join(" ", File.ReadAllLines(fileName));
-                    var parts = Regex.Matches(contents, @"[\""].+?[\""]|[^ ]+", RegexOptions.Multiline)
+                    var parts = Regex.Matches(contents, @"[\""].+?[\""]|[^\s]+")
                         .Cast<Match>()
                         .Select(m => m.Value.Replace("\"", ""))
                         .ToArray();
