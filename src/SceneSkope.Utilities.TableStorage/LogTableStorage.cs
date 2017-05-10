@@ -46,7 +46,10 @@ namespace SceneSkope.Utilities.TableStorage
         {
             var client = account.CreateCloudTableClient();
             var table = client.GetTableReference(tableName);
-            await table.CreateIfNotExistsAsync().ConfigureAwait(false);
+            if (!(await table.ExistsAsync().ConfigureAwait(false)))
+            {
+                await table.CreateAsync().ConfigureAwait(false);
+            }
             return table;
         }
 
@@ -55,7 +58,7 @@ namespace SceneSkope.Utilities.TableStorage
             var client = account.CreateCloudBlobClient();
             var container = client.GetContainerReference(blobContainer);
             await _policy.ExecuteAsync(cancel =>
-                container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Off, null, null, cancel), ct, false).ConfigureAwait(false);
+                container.CreateIfNotExistsAsync(), ct, false).ConfigureAwait(false);
 
             var blob = container.GetBlockBlobReference(blobName);
             return blob;
