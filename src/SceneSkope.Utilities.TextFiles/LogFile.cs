@@ -4,8 +4,9 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SceneSkope.Utilities.Text;
 
-namespace SceneSkope.Utilities.Text
+namespace SceneSkope.Utilities.TextFiles
 {
     public class LogFile : ILogFile
     {

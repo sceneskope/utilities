@@ -5,8 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using SceneSkope.Utilities.Text;
 
-namespace SceneSkope.Utilities.Text
+namespace SceneSkope.Utilities.TextFiles
 {
     public class LogDirectory : BaseLogDirectory
     {
