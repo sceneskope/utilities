@@ -21,8 +21,8 @@ $packageOutputFolder = "$PSScriptRoot\.nupkgs"
 
 $semVer = Get-Content (Join-Path $PSScriptRoot "semver.txt")
 if ($BuildNumber -eq "dev") {
-    $autoVersion = [math]::floor((New-TimeSpan $(Get-Date) $(Get-Date -month 1 -day 1 -year 2016 -hour 0 -minute 0 -second 0)).TotalMinutes * -1).ToString() + "." + (Get-Date).ToString("ss")
-    $version = "$semVer.dev.$autoVersion"
+    $autoVersion = [math]::floor((New-TimeSpan $(Get-Date) $(Get-Date -month 1 -day 1 -year 2016 -hour 0 -minute 0 -second 0)).TotalMinutes * -1).ToString() + "-" + (Get-Date).ToString("ss")
+    $version = "$semVer-dev-$autoVersion"
     $configuration = "Debug"
 }
 else {
