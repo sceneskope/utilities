@@ -23,12 +23,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 var fileName = args[0].Substring(1);
                 if (File.Exists(fileName))
                 {
-                    var contents = string.Join(" ", File.ReadAllLines(fileName));
-                    var parts = Regex.Matches(contents, @"[\""].+?[\""]|[^\s]+")
-                        .Cast<Match>()
-                        .Select(m => m.Value.Replace("\"", ""))
-                        .ToArray();
-                    return parts;
+                    return File.ReadAllLines(fileName);
                 }
             }
             return args;
@@ -48,15 +43,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
             {
                 var arguments = new TArgs();
                 parser.ExtractArgumentAttributes(arguments);
-                for (var i = 0; i < args.Length; i++)
-                {
-                    Console.WriteLine($"Original arg {i} = '{args[i]}'");
-                }
                 processedArgs = PreProcessArgs(args);
-                for (var i = 0; i < processedArgs.Length; i++)
-                {
-                    Console.WriteLine($"Processed arg {i} = '{processedArgs[i]}'");
-                }
                 parser.ParseCommandLine(processedArgs);
                 if (arguments.Help)
                 {
