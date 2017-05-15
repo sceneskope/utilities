@@ -18,5 +18,8 @@ namespace SceneSkope.Utilities.Text
 
         [JsonProperty("Additional")]
         public string Additional { get; set; }
+
+        [JsonProperty("Offset")]
+        public string Offset { get; set; }
     }
 }
