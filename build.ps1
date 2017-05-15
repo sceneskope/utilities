@@ -32,17 +32,30 @@ else {
 
 Write-Host "Restore"
 dotnet restore "/p:Version=$version"
+if ($LastExitCode -ne 0) { 
+    Write-Host "Error with restore, aborting build." -Foreground "Red"
+    Exit 1
+}
 
 if ($RunTests) {
     Write-Host "Running tests"
     Get-ChildItem  -Recurse "tests\*.csproj" |
     ForEach-Object {
         & dotnet test $_
+        if ($LastExitCode -ne 0) { 
+            Write-Host "Error with test, aborting build." -Foreground "Red"
+            Exit 1
+        }
     }
 }
 
 Write-Host "Building"
 dotnet build -c $configuration "/p:Version=$version"
+if ($LastExitCode -ne 0) { 
+    Write-Host "Error with build, aborting build." -Foreground "Red"
+    Exit 1
+}
+
 
 
 if ($CreatePackages) {
@@ -51,6 +64,10 @@ if ($CreatePackages) {
 
     Get-ChildItem $packageOutputFolder | Remove-Item
     dotnet pack --no-build --output $packageOutputFolder -c $configuration "/p:Version=$version" 
+    if ($LastExitCode -ne 0) { 
+        Write-Host "Error with pack, aborting build." -Foreground "Red"
+        Exit 1
+    }
     if ($CopyLocal) {
         Copy-Item -Path "$packageOutputFolder\*.nupkg" -Destination "$env:HOME\Source\Packages"
     }
