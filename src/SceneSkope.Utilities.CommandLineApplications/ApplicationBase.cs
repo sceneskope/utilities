@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,15 +19,27 @@ namespace SceneSkope.Utilities.CommandLineApplications
         private static string[] PreProcessArgs(string[] args)
 #pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
         {
-            if ((args?.Length > 0) && (args[0].Length > 1) && (args[0][0] == '@'))
+            var converted = new List<string>();
+            foreach (var arg in args)
             {
-                var fileName = args[0].Substring(1);
-                if (File.Exists(fileName))
+                if (arg.StartsWith("@"))
                 {
-                    return File.ReadAllLines(fileName);
+                    var fileName = arg.Substring(1);
+                    if (File.Exists(fileName))
+                    {
+                        converted.AddRange(File.ReadAllLines(fileName));
+                    }
+                    else
+                    {
+                        converted.Add(arg);
+                    }
+                }
+                else
+                {
+                    converted.Add(arg);
                 }
             }
-            return args;
+            return converted.ToArray();
         }
 
         public void ApplicationMain(string[] args)
