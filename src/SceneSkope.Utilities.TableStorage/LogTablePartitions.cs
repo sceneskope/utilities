@@ -65,7 +65,7 @@ namespace SceneSkope.Utilities.TableStorage
             return partitions;
         }
 
-        protected override Task<LogTablePartition> GetLogFileAsync(string name, CancellationToken ct, long? position = default(long?), int? lineNumber = default(int?))
+        protected override Task<LogTablePartition> GetLogFileAsync(string name, CancellationToken ct, long? position = default, int? lineNumber = default)
         {
             var partition = new LogTablePartition(_table, name, lineNumber);
             return Task.FromResult(partition);

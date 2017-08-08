@@ -62,7 +62,7 @@ namespace SceneSkope.Utilities.BlobStorage
             return blobs;
         }
 
-        protected override async Task<LogBlob> GetLogFileAsync(string name, CancellationToken ct, long? position = default(long?), int? lineNumber = default(int?))
+        protected override async Task<LogBlob> GetLogFileAsync(string name, CancellationToken ct, long? position = default, int? lineNumber = default)
         {
             var blob = _container.GetBlockBlobReference(name);
             var logBlob = await LogBlob.InitialiseAsync(blob, ct, position, lineNumber).ConfigureAwait(false);
