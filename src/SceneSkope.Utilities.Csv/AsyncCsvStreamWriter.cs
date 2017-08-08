@@ -15,7 +15,7 @@ namespace SceneSkope.Utilities.Csv
         private readonly BufferingAsyncOutputStream _bufferingOutputStream;
         private readonly StreamWriter _streamWriter;
         private readonly CsvWriter _csvWriter;
-        private bool _firstRow = false;
+        private bool _firstRow = true;
         private bool _closed = false;
 
         public AsyncCsvStreamWriter(Stream stream, CsvConfiguration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
