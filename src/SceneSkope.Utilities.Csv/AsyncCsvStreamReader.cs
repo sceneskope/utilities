@@ -24,7 +24,8 @@ namespace SceneSkope.Utilities.Csv
         {
             _bufferingInputStream = new BufferingAsyncInputStream(stream, bufferSize, leaveOpen);
             _streamReader = new StreamReader(_bufferingInputStream);
-            _csvReader = new CsvReader(_streamReader, configuration ?? new CsvConfiguration());
+            var parser = new CsvParser(_streamReader, configuration ?? new CsvConfiguration(), true);
+            _csvReader = new CsvReader(parser);
         }
 
         public async Task<T> ReadRecordAsync<T>(CancellationToken ct)
