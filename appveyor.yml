@@ -1,5 +1,9 @@
+version: '{build}'
+
+pull_requests:
+    do_not_increment_build_number: true
+
 image: Visual Studio 2017 Preview
-configuration: Release
 
 init:
   - git config --global core.autocrlf input
@@ -14,6 +18,8 @@ install:
   - cmd: curl -O https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe
   - cmd: dotnet-sdk-2.0.0-win-x64.exe /install /quiet /norestart /log install.log 
 
+nuget:
+   disable_publish_on_pr: true
 
 build_script:
 - ps: .\build.ps1 -BuildNumber "$env:APPVEYOR_BUILD_NUMBER" -RunTests $true
@@ -22,10 +28,21 @@ test: off
 
 artifacts:
 - path: .\.nupkgs\*.nupkg
+  name: NuGet
+
 
 deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/sceneskope-ci/api/v2/package
+  api_key:
+    secure: 40vHIJA6fQxaD2DKcElD5iWt0Bsjl2TvgKVCK3XZSA9NgbGyXoGzC5lRSaA0O6V3
+  skip_symbols: true
+  on:
+    branch: master
+
 - provider: NuGet
   api_key:
     secure: eaiytjZ8451bGqdim49VhzfsYNDviMmEm/lMbc34oqmznMUEb0BW/9/yFckWyzf1
   on:
     branch: master
+    appveyor_repo_tag: true
