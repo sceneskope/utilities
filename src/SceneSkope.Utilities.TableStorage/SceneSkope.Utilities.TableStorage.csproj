@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Polly" Version="5.3.1" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.3.0" />
+    <PackageReference Include="System.Buffers" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

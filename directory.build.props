@@ -1,7 +1,18 @@
 ﻿<Project>
+  <PropertyGroup>
+    <Copyright>SceneSkope 2016, 2017</Copyright>
+    <Authors>nick.randell@sceneskope.com</Authors>
+    <IsTestProject>$(MSBuildProjectName.Contains('Test'))</IsTestProject>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageIconUrl>https://sceneskope.io/images/sceneskope-logo.png</PackageIconUrl>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Roslynator.Analyzers" Version="1.4.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(IsPackable)' != 'false'">
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.1.2" PrivateAssets="All" />
   </ItemGroup>
 </Project>
