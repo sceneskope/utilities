@@ -39,6 +39,16 @@ deploy:
 - provider: NuGet
   api_key:
     secure: eaiytjZ8451bGqdim49VhzfsYNDviMmEm/lMbc34oqmznMUEb0BW/9/yFckWyzf1
+  skip_symbols: true
   on:
     branch: master
     appveyor_repo_tag: true
+
+- provider: GitHub
+  auth_token:
+    secure: wyRf/wHvY67t+0Lni9CUlbQ77RpieO1OOAN4f47vSwqgxAx9KCfAlH6iMbJYl4xh
+  artifact: /Sceneskope.*\.nupkg/
+  on:
+    branch: master
+    appveyor_repo_tag: true
+    
