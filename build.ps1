@@ -24,7 +24,7 @@ Write-Host "Cleaning anything old"
 dotnet clean -c $Configuration
 
 Write-Host "Building"
-dotnet build -c $Configuration --version-suffix=$suffix
+dotnet build -c $Configuration --version-suffix=$buildSuffix
 if ($LastExitCode -ne 0) { 
     Write-Host "Error with build, aborting build." -Foreground "Red"
     Exit 1
