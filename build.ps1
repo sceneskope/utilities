@@ -47,7 +47,7 @@ if ($CreatePackages) {
     mkdir -Force $packageOutputFolder | Out-Null
 
     Get-ChildItem $packageOutputFolder | Remove-Item
-    dotnet pack --no-build --output $packageOutputFolder -c $Configuration --include-symbols --version-suffix=$suffix
+    dotnet pack --output $packageOutputFolder -c $Configuration --include-symbols --version-suffix=$suffix --no-build
     if ($LastExitCode -ne 0) { 
         Write-Host "Error with pack, aborting build." -Foreground "Red"
         Exit 1
