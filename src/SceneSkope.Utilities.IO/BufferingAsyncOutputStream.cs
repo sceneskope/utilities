@@ -82,8 +82,11 @@ namespace SceneSkope.Utilities.IO
 
         public override Task FlushAsync(CancellationToken cancellationToken) => EmptyAsync(cancellationToken);
 
+        public int LastCount { get; private set; }
+
         public override void Write(byte[] buffer, int offset, int count)
         {
+            LastCount = count;
             while (count > 0)
             {
                 var activeBuffer = _buffers[_writingBuffer];
