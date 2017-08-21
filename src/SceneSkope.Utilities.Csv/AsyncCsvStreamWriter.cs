@@ -21,7 +21,7 @@ namespace SceneSkope.Utilities.Csv
         public AsyncCsvStreamWriter(Stream stream, CsvConfiguration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
         {
             _bufferingOutputStream = new BufferingAsyncOutputStream(stream, bufferSize, leaveOpen);
-            _streamWriter = new StreamWriter(_bufferingOutputStream, Encoding.UTF8, bufferSize, true)
+            _streamWriter = new StreamWriter(_bufferingOutputStream, Encoding.UTF8, 128, true)
             {
                 AutoFlush = true
             };
@@ -47,7 +47,6 @@ namespace SceneSkope.Utilities.Csv
                 _csvWriter.WriteRecord(record);
                 _csvWriter.NextRecord();
             }
-            _streamWriter.Flush();
             if (_bufferingOutputStream.NeedsEmptying)
             {
                 await _bufferingOutputStream.EmptyAsync(ct).ConfigureAwait(false);
