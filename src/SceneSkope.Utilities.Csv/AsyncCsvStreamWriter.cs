@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -28,6 +27,8 @@ namespace SceneSkope.Utilities.Csv
             var serializer = new CsvSerializer(_streamWriter, configuration ?? new CsvConfiguration(), true);
             _csvWriter = new CsvWriter(serializer);
         }
+
+        public long Position => _bufferingOutputStream.Position;
 
         public async Task WriteRecordAsync<T>(T record, CancellationToken ct)
         {
