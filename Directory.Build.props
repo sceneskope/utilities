@@ -6,7 +6,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageIconUrl>https://sceneskope.io/images/sceneskope-logo.png</PackageIconUrl>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>2.1.0</VersionPrefix>
+    <VersionPrefix>2.1.1</VersionPrefix>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
