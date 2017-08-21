@@ -151,7 +151,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Error processing: {exception}", ex.Message);
+                Log.Fatal(ex, "Error processing: {Exception}", ex.Message);
             }
             finally
             {

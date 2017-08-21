@@ -21,7 +21,10 @@ namespace SceneSkope.Utilities.Csv
         public AsyncCsvStreamWriter(Stream stream, CsvConfiguration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
         {
             _bufferingOutputStream = new BufferingAsyncOutputStream(stream, bufferSize, leaveOpen);
-            _streamWriter = new StreamWriter(_bufferingOutputStream, Encoding.UTF8, bufferSize, true);
+            _streamWriter = new StreamWriter(_bufferingOutputStream, Encoding.UTF8, bufferSize, true)
+            {
+                AutoFlush = true
+            };
             var serializer = new CsvSerializer(_streamWriter, configuration ?? new CsvConfiguration(), true);
             _csvWriter = new CsvWriter(serializer);
         }

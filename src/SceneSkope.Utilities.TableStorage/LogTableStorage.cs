@@ -24,7 +24,7 @@ namespace SceneSkope.Utilities.TableStorage
                 }
             })
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
-                => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
+                => Log.Warning("Delaying {Delay} due to {Exception}", ts, ex.Message));
 
         public static async Task<ILogDirectory> CreateAsync(CloudStorageAccount account, string tableName, ILogStatus status, CancellationToken ct)
         {
