@@ -47,6 +47,7 @@ namespace SceneSkope.Utilities.Csv
                 _csvWriter.WriteRecord(record);
                 _csvWriter.NextRecord();
             }
+            _streamWriter.Flush();
             if (_bufferingOutputStream.NeedsEmptying)
             {
                 await _bufferingOutputStream.EmptyAsync(ct).ConfigureAwait(false);
