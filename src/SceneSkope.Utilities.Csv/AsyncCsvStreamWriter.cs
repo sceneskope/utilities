@@ -64,7 +64,10 @@ namespace SceneSkope.Utilities.Csv
         {
             if (!_closed)
             {
-                throw new InvalidOperationException("Writer should be closed before disposing");
+                _csvWriter.Dispose();
+                _streamWriter.Dispose();
+                _bufferingOutputStream.Dispose();
+                _closed = true;
             }
         }
     }
