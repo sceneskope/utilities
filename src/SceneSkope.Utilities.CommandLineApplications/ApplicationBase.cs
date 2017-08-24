@@ -136,6 +136,15 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 {
                     logConfiguration = logConfiguration.WriteTo.ColoredConsole();
                 }
+                if (!string.IsNullOrWhiteSpace(arguments.LogFile))
+                {
+                    if (arguments.LogFile.IndexOf("{Date}", StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        throw new ArgumentException("LogFile must contain {Date} in it's name");
+                    }
+                    logConfiguration = logConfiguration
+                        .WriteTo.RollingFile(arguments.LogFile);
+                }
 
                 var log = logConfiguration
                     .MinimumLevel.Information()
