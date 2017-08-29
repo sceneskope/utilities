@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -62,7 +63,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 {
                     parser.ShowUsage();
                 }
-                else
+                else if (parser.ParsingSucceeded)
                 {
                     Run(arguments);
                 }
@@ -148,6 +149,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
 
                 var log = logConfiguration
                     .MinimumLevel.Information()
+                    .Enrich.WithProperty("Application", Assembly.GetExecutingAssembly().FullName)
                     .CreateLogger();
                 Log.Logger = log;
                 Log.Information("Starting up");
