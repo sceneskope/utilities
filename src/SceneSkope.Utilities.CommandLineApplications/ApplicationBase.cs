@@ -150,7 +150,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                     .Enrich.WithProperty("Application", Assembly.GetEntryAssembly().GetName().Name)
                     .CreateLogger();
                 Log.Logger = log;
-                Log.Information("Starting up");
+                Log.Debug("Starting up");
 
                 RunAsync(arguments, tokenSource.Token).GetAwaiter().GetResult();
             }
@@ -178,7 +178,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
             if (!_exited)
             {
                 _exited = true;
-                Log.Information("Finished");
+                Log.Debug("Finished");
                 Log.CloseAndFlush();
                 if (_telemetryClient != null)
                 {
