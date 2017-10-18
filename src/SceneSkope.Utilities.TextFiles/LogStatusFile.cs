@@ -64,7 +64,7 @@ namespace SceneSkope.Utilities.TextFiles
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Failed to read status files: {exception}", ex.Message);
+                    Log.Error(ex, "Failed to read status files: {Exception}", ex.Message);
                     _statuses = new List<LogFilesStatus>();
                 }
             }

@@ -28,7 +28,7 @@ namespace SceneSkope.Utilities.BlobStorage
                 }
             })
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
-                => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
+                => Log.Warning("Delaying {Delay} due to {Exception}", ts, ex.Message));
 
         public LogStatusBlob(CloudStorageAccount account, string containerName, string blobName)
         {
@@ -77,7 +77,7 @@ namespace SceneSkope.Utilities.BlobStorage
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Failed to read status files: {exception}", ex.Message);
+                    Log.Error(ex, "Failed to read status files: {Exception}", ex.Message);
                     _statuses = new List<LogFilesStatus>();
                 }
             }

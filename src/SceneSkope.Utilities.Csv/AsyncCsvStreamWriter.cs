@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -18,13 +17,15 @@ namespace SceneSkope.Utilities.Csv
         private bool _firstRow = true;
         private bool _closed = false;
 
-        public AsyncCsvStreamWriter(Stream stream, CsvConfiguration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
+        public AsyncCsvStreamWriter(Stream stream, Configuration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
         {
             _bufferingOutputStream = new BufferingAsyncOutputStream(stream, bufferSize, leaveOpen);
             _streamWriter = new StreamWriter(_bufferingOutputStream, Encoding.UTF8, bufferSize, true);
-            var serializer = new CsvSerializer(_streamWriter, configuration ?? new CsvConfiguration(), true);
+            var serializer = new CsvSerializer(_streamWriter, configuration ?? new Configuration(), true);
             _csvWriter = new CsvWriter(serializer);
         }
+
+        public long Position => _bufferingOutputStream.Position;
 
         public async Task WriteRecordAsync<T>(T record, CancellationToken ct)
         {
@@ -63,7 +64,10 @@ namespace SceneSkope.Utilities.Csv
         {
             if (!_closed)
             {
-                throw new InvalidOperationException("Writer should be closed before disposing");
+                _csvWriter.Dispose();
+                _streamWriter.Dispose();
+                _bufferingOutputStream.Dispose();
+                _closed = true;
             }
         }
     }

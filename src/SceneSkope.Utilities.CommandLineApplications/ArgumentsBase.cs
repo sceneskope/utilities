@@ -17,5 +17,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
         public abstract bool Help { get; set; }
 
         public abstract bool NoConsole { get; set; }
+
+        public abstract string LogFile { get; set; }
     }
 }

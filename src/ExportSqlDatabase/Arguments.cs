@@ -28,5 +28,8 @@ namespace ExportSqlDatabase
 
         [ValueArgument(typeof(string), 'q', "seqhost", Description = "Seq server host", Optional = true)]
         public override string SeqHost { get; set; }
+
+        [ValueArgument(typeof(string), "logfile", Description = "Log file name with {Date} template", Optional = true)]
+        public override string LogFile { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace SceneSkope.Utilities.BlobStorage
         {
             _container = container;
             _patternRegex = BaseLogDirectory.CreatePatternRegex(pattern);
-            Log.Information("Using status {status}", status);
+            Log.Information("Using status {Status}", status);
         }
 
         protected override async Task<IEnumerable<string>> FindNewFilesAsync(CancellationToken ct)

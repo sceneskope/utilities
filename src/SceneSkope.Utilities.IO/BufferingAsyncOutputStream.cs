@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace SceneSkope.Utilities.IO
 
         private int _readingBuffer;
         private int _writingBuffer;
-        private int _availableBuffers;
+        private int _fullBuffers;
         private bool _errored;
 
         public BufferingAsyncOutputStream(Stream outputStream, int bufferSize = 8192, bool leaveOpen = false)
@@ -53,17 +54,17 @@ namespace SceneSkope.Utilities.IO
 
         public async Task EmptyAsync(CancellationToken ct)
         {
-            while (_availableBuffers > 0)
+            while (NeedsEmptying)
             {
                 var buffer = _buffers[_readingBuffer];
                 await _outputStream.WriteAsync(buffer.Array, 0, buffer.Position, ct).ConfigureAwait(false);
                 buffer.Position = 0;
                 _readingBuffer = (_readingBuffer + 1) % _buffers.Length;
-                _availableBuffers--;
+                _fullBuffers--;
             }
         }
 
-        public bool NeedsEmptying => _availableBuffers > 0;
+        public bool NeedsEmptying => _fullBuffers > 0;
 
         public override bool CanRead => false;
 
@@ -82,8 +83,11 @@ namespace SceneSkope.Utilities.IO
 
         public override Task FlushAsync(CancellationToken cancellationToken) => EmptyAsync(cancellationToken);
 
+        public int LastCount { get; private set; }
+
         public override void Write(byte[] buffer, int offset, int count)
         {
+            LastCount = count;
             while (count > 0)
             {
                 var activeBuffer = _buffers[_writingBuffer];
@@ -103,8 +107,8 @@ namespace SceneSkope.Utilities.IO
                 if (activeBuffer.Finished)
                 {
                     _writingBuffer = (_writingBuffer + 1) % _buffers.Length;
-                    _availableBuffers++;
-                    if ((count > 0) && (_availableBuffers == _buffers.Length))
+                    _fullBuffers++;
+                    if ((count > 0) && (_fullBuffers == _buffers.Length))
                     {
                         _errored = true;
                         throw new IOException("Buffer size too small, reading and writing buffers the same");

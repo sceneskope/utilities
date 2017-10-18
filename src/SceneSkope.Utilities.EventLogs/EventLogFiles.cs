@@ -41,14 +41,14 @@ namespace SceneSkope.Utilities.EventLogs
                         case TimeoutException _: return true;
                         case SocketException _: return true;
                         default:
-                            Log.Warning("Caught {exception} ({type}), but not handling", ex.Message, ex.GetType());
+                            Log.Warning("Caught {Exception} ({Type}), but not handling", ex.Message, ex.GetType());
                             return false;
                     }
                 })
                 .WaitAndRetryForeverAsync(_ => TimeSpan.FromSeconds(10),
                 (ex, ts) =>
                 {
-                    Log.Information("Caught {exception}, delaying for {ts}", ex.Message, ts);
+                    Log.Information("Caught {Exception}, delaying for {Ts}", ex.Message, ts);
                     return CloseClientIfRequiredAsync();
                 });
         }
@@ -68,7 +68,7 @@ namespace SceneSkope.Utilities.EventLogs
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "Error closing: {exception}", ex.Message);
+                Log.Warning(ex, "Error closing: {Exception}", ex.Message);
                 throw;
             }
         }

@@ -29,10 +29,10 @@ namespace ExportSqlDatabase
                     new CommandDefinition("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'", cancellationToken: ct)
                 ).ConfigureAwait(false)).AsList();
 
-                Log.Information("Processing {count} tables", tables.Count);
+                Log.Information("Processing {Count} tables", tables.Count);
                 foreach (var table in tables)
                 {
-                    Log.Information("Processing {table}", table);
+                    Log.Information("Processing {Table}", table);
                     var rowCount = 0;
                     var outputFileName = $@"{outputDirectory.FullName}\{table}.tsv";
                     using (var reader = await connection.ExecuteReaderAsync(new CommandDefinition($"select * from {table}", cancellationToken: ct)).ConfigureAwait(false) as DbDataReader)
@@ -66,7 +66,7 @@ namespace ExportSqlDatabase
                             await writer.WriteLineAsync().ConfigureAwait(false);
                         }
                     }
-                    Log.Information("Written {rowCount} rows", rowCount);
+                    Log.Information("Written {RowCount} rows", rowCount);
                 }
             }
         }

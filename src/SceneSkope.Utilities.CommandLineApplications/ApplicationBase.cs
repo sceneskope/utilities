@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
@@ -62,7 +61,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 {
                     parser.ShowUsage();
                 }
-                else
+                else if (parser.ParsingSucceeded)
                 {
                     Run(arguments);
                 }
@@ -136,12 +135,22 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 {
                     logConfiguration = logConfiguration.WriteTo.ColoredConsole();
                 }
+                if (!string.IsNullOrWhiteSpace(arguments.LogFile))
+                {
+                    if (arguments.LogFile.IndexOf("{Date}", StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        throw new ArgumentException("LogFile must contain {Date} in it's name");
+                    }
+                    logConfiguration = logConfiguration
+                        .WriteTo.RollingFile(arguments.LogFile);
+                }
 
                 var log = logConfiguration
                     .MinimumLevel.Information()
+                    .Enrich.WithProperty("Application", Assembly.GetEntryAssembly().GetName().Name)
                     .CreateLogger();
                 Log.Logger = log;
-                Log.Information("Starting up");
+                Log.Debug("Starting up");
 
                 RunAsync(arguments, tokenSource.Token).GetAwaiter().GetResult();
             }
@@ -151,7 +160,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Error processing: {exception}", ex.Message);
+                Log.Fatal(ex, "Error processing: {Exception}", ex.Message);
             }
             finally
             {
@@ -169,7 +178,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
             if (!_exited)
             {
                 _exited = true;
-                Log.Information("Finished");
+                Log.Debug("Finished");
                 Log.CloseAndFlush();
                 if (_telemetryClient != null)
                 {

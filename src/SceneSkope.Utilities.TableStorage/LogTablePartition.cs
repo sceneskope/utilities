@@ -26,7 +26,7 @@ namespace SceneSkope.Utilities.TableStorage
                 }
             })
             .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
-                => Log.Warning("Delaying {delay} due to {exception}", ts, ex.Message));
+                => Log.Warning("Delaying {Delay} due to {Exception}", ts, ex.Message));
 
         public LogTablePartition(CloudTable table, string name, int? lineNumber)
         {
