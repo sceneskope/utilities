@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="3.0.0-chi06" />
+    <PackageReference Include="CsvHelper" Version="3.4.0" />
     <PackageReference Include="Dapper" Version="1.50.2" />
   </ItemGroup>
 

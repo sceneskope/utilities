@@ -74,7 +74,7 @@ namespace SceneSkope.Utilities.Text
             var nextFile = await TryGetNextFileAsync(cancel).ConfigureAwait(false);
             if (nextFile != null)
             {
-                var (position, lineNumber) = ((Status.CurrentName != null) && Status.CurrentName.Equals(nextFile)) ?
+                var (position, lineNumber) = (Status.CurrentName?.Equals(nextFile) == true) ?
                     (Status.Position, Status.LineNumber)
                     : (null, 0);
                 _logFile = await GetLogFileAsync(nextFile, cancel, position, lineNumber).ConfigureAwait(false);

@@ -20,11 +20,11 @@ namespace SceneSkope.Utilities.Csv
 
         public ReadingContext CsvContext => _csvReader.Context as ReadingContext;
 
-        public AsyncCsvStreamReader(Stream stream, CsvConfiguration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
+        public AsyncCsvStreamReader(Stream stream, Configuration configuration = null, bool leaveOpen = false, int bufferSize = 8192)
         {
             _bufferingInputStream = new BufferingAsyncInputStream(stream, bufferSize, leaveOpen);
             _streamReader = new StreamReader(_bufferingInputStream);
-            var parser = new CsvParser(_streamReader, configuration ?? new CsvConfiguration(), true);
+            var parser = new CsvParser(_streamReader, configuration ?? new Configuration(), true);
             _csvReader = new CsvReader(parser);
         }
 

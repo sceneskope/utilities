@@ -13,4 +13,8 @@
     <ProjectReference Include="..\SceneSkope.Utilities.Text\SceneSkope.Utilities.Text.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="SourceLink.Create.CommandLine" Version="2.5.0" />
+  </ItemGroup>
+
 </Project>
