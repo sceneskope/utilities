@@ -145,11 +145,11 @@ namespace SceneSkope.Utilities.CommandLineApplications
                         .WriteTo.RollingFile(arguments.LogFile);
                 }
 
-                var log = logConfiguration
+                Log.Logger = logConfiguration
                     .MinimumLevel.Information()
                     .Enrich.WithProperty("Application", Assembly.GetEntryAssembly().GetName().Name)
+                    .Enrich.WithDemystifiedStackTraces()
                     .CreateLogger();
-                Log.Logger = log;
                 Log.Debug("Starting up");
 
                 RunAsync(arguments, tokenSource.Token).GetAwaiter().GetResult();
