@@ -4,8 +4,5 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Update="SourceLink.Create.CommandLine" Version="2.5.0" />
-  </ItemGroup>
 
 </Project>
