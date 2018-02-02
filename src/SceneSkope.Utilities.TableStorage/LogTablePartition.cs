@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Polly;
 using SceneSkope.Utilities.Text;
-using Serilog;
 
 namespace SceneSkope.Utilities.TableStorage
 {
@@ -16,17 +12,6 @@ namespace SceneSkope.Utilities.TableStorage
         private List<LogTableEntity> _buffer;
         private int _bufferPosition;
         private string _rowKey;
-        private readonly Policy _policy =
-            Policy
-            .Handle<StorageException>(ex =>
-            {
-                switch (ex?.RequestInformation?.HttpStatusCode)
-                {
-                    default: return true;
-                }
-            })
-            .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
-                => Log.Warning("Delaying {Delay} due to {Exception}", ts, ex.Message));
 
         public LogTablePartition(CloudTable table, string name, int? lineNumber)
         {

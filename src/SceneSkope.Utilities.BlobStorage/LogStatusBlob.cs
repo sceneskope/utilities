@@ -27,7 +27,7 @@ namespace SceneSkope.Utilities.BlobStorage
                     default: return true;
                 }
             })
-            .WaitAndRetryForeverAsync(attempt => TimeSpan.FromSeconds(2), (ex, ts)
+            .WaitAndRetryForeverAsync(_ => TimeSpan.FromSeconds(2), (ex, ts)
                 => Log.Warning("Delaying {Delay} due to {Exception}", ts, ex.Message));
 
         public LogStatusBlob(CloudStorageAccount account, string containerName, string blobName)

@@ -6,15 +6,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageIconUrl>https://sceneskope.io/images/sceneskope-logo.png</PackageIconUrl>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Roslynator.Analyzers" Version="1.6.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Roslynator.Analyzers" Version="1.7.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(IsPackable)' != 'false'">
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.6.0" PrivateAssets="All" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.7.6" PrivateAssets="All" />
   </ItemGroup>
 </Project>

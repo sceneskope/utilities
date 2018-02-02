@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
@@ -12,11 +11,45 @@ using Serilog.Core;
 
 namespace SceneSkope.Utilities.CommandLineApplications
 {
-    public abstract class ApplicationBase<TArgs> where TArgs : ArgumentsBase, new()
+    public class ApplicationBase
     {
-#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
-        private static string[] PreProcessArgs(string[] args)
-#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
+        public static void OnExit(Action onExit)
+        {
+            var assemblyLoadContextType = Type.GetType("System.Runtime.Loader.AssemblyLoadContext, System.Runtime.Loader");
+            if (assemblyLoadContextType != null)
+            {
+                var currentLoadContext = assemblyLoadContextType.GetTypeInfo().GetProperty("Default").GetValue(null, null);
+                var unloadingEvent = currentLoadContext.GetType().GetTypeInfo().GetEvent("Unloading");
+                var delegateType = typeof(Action<>).MakeGenericType(assemblyLoadContextType);
+#pragma warning disable RCS1163 // Unused parameter.
+#pragma warning disable IDE0039 // Use local function
+                Action<object> lambda = (context) => onExit();
+#pragma warning restore IDE0039 // Use local function
+#pragma warning restore RCS1163 // Unused parameter.
+                unloadingEvent.AddEventHandler(currentLoadContext, lambda.GetMethodInfo().CreateDelegate(delegateType, lambda.Target));
+                return;
+            }
+
+            var appDomainType = Type.GetType("System.AppDomain, mscorlib");
+            if (appDomainType != null)
+            {
+                var currentAppDomain = appDomainType.GetTypeInfo().GetProperty("CurrentDomain").GetValue(null, null);
+                var processExitEvent = currentAppDomain.GetType().GetTypeInfo().GetEvent("ProcessExit");
+#pragma warning disable IDE0039 // Use local function
+                EventHandler lambda = (sender, e) => onExit();
+#pragma warning restore IDE0039 // Use local function
+                processExitEvent.AddEventHandler(currentAppDomain, lambda);
+                return;
+                // Note that .NETCore has a private System.AppDomain which lacks the ProcessExit event.
+                // That's why we test for AssemblyLoadContext first!
+            }
+
+            var isNetCore = (Type.GetType("System.Object, System.Runtime") != null);
+            if (isNetCore) throw new Exception("Before calling this function, declare a variable of type 'System.Runtime.Loader.AssemblyLoadContext' from NuGet package 'System.Runtime.Loader'");
+            else throw new Exception("Neither mscorlib nor System.Runtime.Loader is referenced");
+        }
+
+        internal static string[] PreProcessArgs(string[] args)
         {
             var converted = new List<string>();
             foreach (var arg in args)
@@ -41,6 +74,29 @@ namespace SceneSkope.Utilities.CommandLineApplications
             return converted.ToArray();
         }
 
+        internal protected LockFile _lockFile;
+        internal protected TelemetryClient _telemetryClient;
+        internal protected bool _exited;
+
+        internal protected void Unload()
+        {
+            if (!_exited)
+            {
+                _exited = true;
+                Log.Debug("Finished");
+                Log.CloseAndFlush();
+                if (_telemetryClient != null)
+                {
+                    _telemetryClient.Flush();
+                    Thread.Sleep(1000);
+                }
+                _lockFile?.Dispose();
+            }
+        }
+    }
+
+    public abstract class ApplicationBase<TArgs> : ApplicationBase where TArgs : ArgumentsBase, new()
+    {
         public void ApplicationMain(string[] args)
         {
             string[] processedArgs = null;
@@ -84,9 +140,6 @@ namespace SceneSkope.Utilities.CommandLineApplications
             }
         }
 
-        private LockFile _lockFile;
-        private TelemetryClient _telemetryClient;
-
         private void Run(TArgs arguments)
         {
             if (!string.IsNullOrWhiteSpace(arguments.LockFile))
@@ -101,7 +154,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
                 _lockFile = null;
             }
 
-            AssemblyLoadContext.Default.Unloading += _ => Unload();
+            OnExit(Unload);
 
             _telemetryClient = null;
             try
@@ -133,7 +186,7 @@ namespace SceneSkope.Utilities.CommandLineApplications
 
                 if (!arguments.NoConsole)
                 {
-                    logConfiguration = logConfiguration.WriteTo.ColoredConsole();
+                    logConfiguration = logConfiguration.WriteTo.Console();
                 }
                 if (!string.IsNullOrWhiteSpace(arguments.LogFile))
                 {
@@ -169,23 +222,6 @@ namespace SceneSkope.Utilities.CommandLineApplications
             if (Debugger.IsAttached)
             {
                 Debugger.Break();
-            }
-        }
-
-        private bool _exited;
-        private void Unload()
-        {
-            if (!_exited)
-            {
-                _exited = true;
-                Log.Debug("Finished");
-                Log.CloseAndFlush();
-                if (_telemetryClient != null)
-                {
-                    _telemetryClient.Flush();
-                    Thread.Sleep(1000);
-                }
-                _lockFile?.Dispose();
             }
         }
 
